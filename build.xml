@@ -1,0 +1,41 @@
+<project name="PubSim">
+  <property environment="env"/>
+  <property name="base.dir" value="." />
+  <property name="sources.dir" value="${base.dir}" />
+  <property name="build.dir" value="${base.dir}/build" />
+
+  <target name="init">
+    <path id="build.classpath">
+      <fileset dir="${base.dir}/lib">
+	<include name="*.jar" />
+	<exclude name="SounderJava.jar" />
+      </fileset>
+    </path>
+  </target>
+
+  <target name="buildjava" depends="init">
+    <mkdir dir="${build.dir}" />
+    <javac srcdir="${sources.dir}"
+            destdir="${build.dir}"
+            classpathref="build.classpath"
+	    includeantruntime="false">
+      <include name="src/**/*.java"   />
+    </javac>
+    <jar destfile="${base.dir}/lib/SounderJava.jar">
+      <fileset dir="src/java/"/>
+      <fileset dir="build/"/>
+    </jar>
+  </target>
+
+  <target name="build" depends="buildjava">
+  </target>
+
+  <target name="clean">
+    <delete>
+      <fileset dir="${build.dir}" includes="**/*.class" />
+    </delete>
+  </target>
+
+
+
+</project>
