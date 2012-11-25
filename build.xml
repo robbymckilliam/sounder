@@ -1,10 +1,11 @@
-<project name="PubSim">
+<project name="Sounder">
   <property environment="env"/>
   <property name="base.dir" value="." />
   <property name="sources.dir" value="${base.dir}" />
   <property name="build.dir" value="${base.dir}/build" />
+<property name="scala.home" value="${env.SCALA_HOME}" />
 
-  <target name="init">
+  <target name="initjava">
     <path id="build.classpath">
       <fileset dir="${base.dir}/lib">
 	<include name="*.jar" />
@@ -13,7 +14,7 @@
     </path>
   </target>
 
-  <target name="buildjava" depends="init">
+  <target name="buildjava" depends="initjava">
     <mkdir dir="${build.dir}" />
     <javac srcdir="${sources.dir}"
             destdir="${build.dir}"
@@ -27,7 +28,36 @@
     </jar>
   </target>
 
-  <target name="build" depends="buildjava">
+
+  <target name="initscala">
+    <property name="scala-library.jar" value="${scala.home}/lib/scala-library.jar" />
+    <path id="build.classpath">
+      <pathelement location="${scala-library.jar}"   />
+      <fileset dir="${base.dir}/lib">
+	<include name="*.jar" />
+	<exclude name="Sounder.jar" />
+      </fileset>
+    </path>
+    <taskdef resource="scala/tools/ant/antlib.xml">
+      <classpath>
+	<pathelement location="${scala.home}/lib/scala-compiler.jar"   />
+	<pathelement location="${scala-library.jar}"   />
+      </classpath>
+    </taskdef>
+  </target>
+
+  <target name="buildscala" depends="initscala">
+    <mkdir dir="${build.dir}" />
+    <scalac srcdir="${sources.dir}"
+            destdir="${build.dir}"
+            classpathref="build.classpath"
+	    addparams="-optimise">
+      <include name="src/**/*.scala"   />
+    </scalac>
+    <jar destfile="${base.dir}/lib/Sounder.jar" basedir="${build.dir}" />
+  </target>
+
+  <target name="build" depends="buildscala">
   </target>
 
   <target name="clean">

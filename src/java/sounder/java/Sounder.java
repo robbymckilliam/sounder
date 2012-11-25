@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package sounder;
+package sounder.java;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -17,9 +17,9 @@ public class Sounder {
 
     public Sounder() {
     }
-    
-    public void out(double freq, double vol){
-        float sampleRate = 44100.0F;
+
+    public void out(double freq, double vol) {
+        float sampleRate = 22000.0F;
         AudioFormat audioFormat = new AudioFormat(
                 sampleRate, //sample rate
                 16, //bits per sample
@@ -36,19 +36,30 @@ public class Sounder {
             System.out.println("unable to get an audio output line");
             System.exit(1);
         }
+
+        int N = (int) (5 * sampleRate); //five seconds worth of samples
         
-        int N = (int)(5 * sampleRate); //five seconds worth of samples
-        ByteBuffer buff = ByteBuffer.allocate(N * audioFormat.getFrameSize());
+//        ByteBuffer buff = ByteBuffer.allocate(N * audioFormat.getFrameSize());
+//        buff.order(ByteOrder.LITTLE_ENDIAN);
+//        for (int i = 0; i < N; i++) {
+//            short v =  (short) Math.round(vol * Math.sin(freq/sampleRate * i));
+//            buff.putShort(v);
+//        }
+//        sourceDataLine.start();
+//        sourceDataLine.write(buff.array(), 0, N * audioFormat.getFrameSize());
+//        sourceDataLine.stop();
+
+        sourceDataLine.start();
+        ByteBuffer buff = ByteBuffer.allocate(audioFormat.getFrameSize());
         buff.order(ByteOrder.LITTLE_ENDIAN);
         for (int i = 0; i < N; i++) {
-            short v =  (short) Math.round(vol * Math.sin(freq/sampleRate * i));
-            buff.putShort(v);
+            short v =  (short) Math.round(vol * Math.sin(2*Math.PI*freq/sampleRate * i));
+            buff.putShort(0,v);
+            sourceDataLine.write(buff.array(), 0, audioFormat.getFrameSize());
         }
-        sourceDataLine.start();
-        sourceDataLine.write(buff.array(), 0, N * audioFormat.getFrameSize());
         sourceDataLine.stop();
 
-        
+
     }
 
     public void in() {
@@ -95,5 +106,4 @@ public class Sounder {
         } catch (IOException e) {
         }
     }
-    
 }
