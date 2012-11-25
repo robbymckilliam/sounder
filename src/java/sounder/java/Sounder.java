@@ -58,7 +58,7 @@ public class Sounder {
             sourceDataLine.write(buff.array(), 0, audioFormat.getFrameSize());
         }
         sourceDataLine.stop();
-
+        sourceDataLine.close();
 
     }
 
