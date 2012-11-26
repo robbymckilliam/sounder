@@ -22,8 +22,11 @@ class SounderTest {
     println("You should here a 1000Hz tone play for 2 seconds.") 
     play(t => 50*sin(2*Pi*1000*t), 0.0, 2.0)
     println("You should here a 2000Hz tone play for 2 seconds.") 
-    play(t => 50*sin(2*Pi*2000*t), 0.0, 2.0)
-    
+    play(t => 50*sin(2*Pi*2000*t), 0.0, 2.0)    
+  }
+  
+  @Test def SounderTest() {
+    val s = new Sounder(t => 50*sin(2*Pi*100*t), 0, 2)
   }
   
 }
