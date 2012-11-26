@@ -21,6 +21,8 @@ class SounderTest {
     play(t => 50*sin(2*Pi*500*t), 0.0, 2.0)
     println("You should here a 1000Hz tone play for 2 seconds.") 
     play(t => 50*sin(2*Pi*1000*t), 0.0, 2.0)
+    println("You should here a 2000Hz tone play for 2 seconds.") 
+    play(t => 50*sin(2*Pi*2000*t), 0.0, 2.0)
     
   }
   

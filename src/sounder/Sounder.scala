@@ -13,10 +13,12 @@ import javax.sound.sampled._;
 
 object Sounder {
   
-  /** Defines at what level functions clip, i.e. saturate the output voltage. */
-  val clipLevel = 100.0
-  
-  def play(f : Double => Double, start : Double, stop : Double, sampleRate : Float = 44100F) {
+  /** 
+   * Plays the function f from time start to time stop out of the speakers.  Optional aguments are 
+   * sampleRate (default 44100Hz i.e. CD quality) and clipLevel (default 100) which specfies the
+   * maximum magnitude f can attain before being clipped (wrapped).
+   */
+  def play(f : Double => Double, start : Double, stop : Double, sampleRate : Float = 44100F, clipLevel : Double = 100.0) {
       val audioFormat = new AudioFormat(
                 sampleRate, //sample rate
                 16, //bits per sample (corresponds with Short)
@@ -32,7 +34,7 @@ object Sounder {
         val buff = ByteBuffer.allocate(numSamples*audioFormat.getFrameSize) //buffer for sound
         buff.order(ByteOrder.LITTLE_ENDIAN)
         for( i <- 1 to numSamples ) {
-          //quantise to a short.  This clips if the function is larger than 1
+          //quantise to a short.  This clips (wraps) if the function is larger than 1
           val v : Short = scala.math.round(scala.Short.MaxValue/clipLevel*f(i/sampleRate + start)).toShort
           buff.putShort(v);
         }
