@@ -99,14 +99,14 @@ class Sounder(x : Double => Double, duration : Double, sampleRate : Float = 4410
   recorder.close
   player.close
   
-  val recodered = recorderBuff.asShortBuffer.array
+  val recodered = recorderBuff.asShortBuffer
   
   /** Simple zero order hold output function */
   def y(t : Double) : Double = {
     //round to a sample
     val i = round(t * sampleRate).toInt
-    if(i < 0 || i >= recodered.length) return 0.0
-    else return recodered(i)
+    if(i < 0 || i >= recoderBufferSize/2) return 0.0
+    else return recodered.get(i)
   }
   
 }

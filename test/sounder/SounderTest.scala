@@ -31,7 +31,7 @@ class SounderTest {
     println("You should here a 150Hz tone play for 2 seconds.")
     val s = new Sounder(t => 50*sin(2*Pi*150*t), 2.0)
     println("Now playing the recorded copy.")
-    play(s.y, 0.0, 2.5)
+    play(s.y, -0.1, 2.4)
   }
   
 }
