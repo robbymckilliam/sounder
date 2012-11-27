@@ -83,7 +83,7 @@ class Sounder(x : Double => Double, duration : Double, sampleRate : Float = 4410
     val v = round(Short.MaxValue/clipLevel*x(i/sampleRate)).toShort
     playBuff.putShort(v);
   }
-  val recoderBufferSize = ceil((1+recorderTail)*numSamples*audioFormat.getFrameSize).toInt //recorder buffer goes for recorderTail% longer
+  val recoderBufferSize = 3*ceil((1+recorderTail)*numSamples*audioFormat.getFrameSize).toInt //recorder buffer goes for recorderTail% longer
   val recorderBuff = ByteBuffer.allocate(recoderBufferSize) //buffer for recording
   recorder.open(audioFormat, recoderBufferSize)
   player.open(audioFormat, playBuff.array, 0, numSamples*audioFormat.getFrameSize) //load the player
