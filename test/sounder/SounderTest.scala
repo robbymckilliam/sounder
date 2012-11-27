@@ -29,9 +29,9 @@ class SounderTest {
   @Test def SounderTest() {
     println("Testing the channel sounder. Connect the output of the soundcard to the input")
     println("You should here a 150Hz tone play for 2 seconds.")
-    val s = new Sounder(t => 50*sin(2*Pi*150*t), 2.0)
+    val s = new Sounder(t => 50*sin(2*Pi*150*t), 5.0)
     println("Now playing the recorded copy.")
-    play(s.y, -3, 8)
+    play(s.y, -3, 20)
   }
   
 }
