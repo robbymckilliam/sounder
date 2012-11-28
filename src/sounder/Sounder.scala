@@ -89,6 +89,7 @@ class Sounder(x : Double => Double, duration : Double, sampleRate : Float = 4410
   player.open(audioFormat, playBuff.array, 0, numSamples*audioFormat.getFrameSize) //load the player
   
   recorder.start
+  recorder.flush
   player.start
   player.drain
   player.stop
