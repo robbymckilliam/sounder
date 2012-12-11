@@ -46,6 +46,7 @@ object Sounder {
       
     clip.open(audioFormat, buff.array, 0, numSamples*audioFormat.getFrameSize)
     clip.start
+    Thread.drain(5)
     clip.drain
     clip.stop
     clip.close
@@ -91,10 +92,12 @@ class Sounder(x : Double => Double, duration : Double, sampleRate : Float = 4410
   recorder.start
   recorder.flush
   player.start
+  Thread.delay(5)
   player.drain
   player.stop
   
   recorder.read(recorderBuff.array,0,recoderBufferSize)
+  Thread.delay(5)
   recorder.stop
   
   recorder.close
