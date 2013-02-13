@@ -124,37 +124,21 @@ object PlayApp extends SimpleSwingApplication {
             val temp = chooser.showOpenDialog(ui)
             if(temp == FileChooser.Result.Approve) {
               val file = chooser.selectedFile
-              /*
-              val is = new FileInputStream(file)
-              val length = file.length()
-              if(length > Integer.MAX_VALUE) {
-                println("File too large")
-              } else {
-                val bytes = new Array[Byte](length.toInt)
-                var offset = 0
-                var numRead = 0
-                while(offset < bytes.length && {numRead = is.read(bytes,offset,bytes.length-offset); numRead >= 0} ) {
-                  offset += numRead
+              val length = file.getPath.length
+              val name = file.getPath
+              // Checks to see if file is a txt or a wav and saves accordingly
+              if(name(length-3)+name(length-2).toString+name(length-1) == "wav") {
+                fBuff = sounder.AudioCreater.wavConverter(file)
+                
+              } else if(name(length-3)+name(length-2).toString+name(length-1) == "txt") {            
+                val reader = new FileReader(file)
+                val src = new Scanner(reader)
+                val arrBuff = new ArrayBuffer[Byte]()
+                while(src.hasNext) {
+                  arrBuff += src.next().toByte
                 }
-                if (offset < bytes.length) {
-                  throw new IOException("Could not completely read file "+file.getName)
-                }
-                is.close()
-                fBuff = bytes
-              }
-             */
-              
-              val reader = new FileReader(file)
-              val src = new Scanner(reader)
-              val arrBuff = new ArrayBuffer[Byte]()
-            //println(System.currentTimeMillis())
-              while(src.hasNext) {
-                arrBuff += src.nextLine().toByte
-// arrBuff+= src.nextLine().toByte       
-              }
-              fBuff = arrBuff.toArray
-              
-          //  println(System.currentTimeMillis())
+                fBuff = arrBuff.toArray
+             }
 
             }          
         })
@@ -162,15 +146,21 @@ object PlayApp extends SimpleSwingApplication {
             val temp = chooser.showSaveDialog(ui)
             if(temp == FileChooser.Result.Approve) {
               val file = chooser.selectedFile
-              val filePrint = new PrintWriter(new File(file.getPath+".txt"))
-           
-              for(i<- 0 until fBuff.length) {
-                filePrint.write(fBuff(i).toString+"\n") //"\n"
-                
+              
+              val length = file.getPath.length
+              val name = file.getPath
+              // Checks to see if file is a txt or a wav and saves accordingly
+              if(name(length-3)+name(length-2).toString+name(length-1) == "txt") {
+                val filePrint = new PrintWriter(new File(file.getPath))
+                var i = 0
+                for(j<- 0 until fBuff.length/2) {
+                  filePrint.write(fBuff(i).toString+"  "+fBuff(i+1).toString+"\n")
+                  i+=2
+                }
+                filePrint.close()
+              } else if(name(length-3)+name(length-2).toString+name(length-1) == "wav") {
+                sounder.AudioCreater.wavCreater(fBuff, name, 44100F)
               }
-              filePrint.close()
-            //  println(file.length)
-              //println(fBuff.length)
             }
         })
       
@@ -193,7 +183,9 @@ object PlayApp extends SimpleSwingApplication {
                   +"\n"+"The next box is the frequency of the function, restricted to values below 20,000 Hz, due to restrictions to human hearing and the soundcard"
                   +"\n"+"The next box shows the function which has been created so far and what will be played"
                   +"\n"+"The final box will set how long the function will play for, restricted to postive times." */
-                  +"\n"+"Press Add to add a function to be played  Press Play to hear the function  Press Play and Record to record the function  Press Playback to hear the recorded version  Press Clear to start fresh", "Help")
+                  +"\n"+"Press Add to add a function to be played  Press Play to hear the function  Press Play and Record to record the function  Press Playback to hear the recorded version  Press Clear to start fresh.\n"
+                  +"\n"+"To Save the file select File/Save and then find the location you would like to save, to save as a txt file add the extention .txt to save as a wav add .wav\n"
+                  +"To Load in a file select File/Open and find the location of the file, only txt files under 50000KB will load (3min of audio) or wav files that were created by this GUI", "Help")
         })
       }
     }
