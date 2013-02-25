@@ -114,6 +114,26 @@ object Sounder {
     clip2.stop
     clip2.close
   }
+  // Takes a Byte array, plays it through headphone port, while recording mic input
+  def playBuffRec(buff:Array[Byte], sampleRate : Float = 44100F): Array[Byte] = { 
+    val audioFormat = new AudioFormat(sampleRate, 16, 1, true, true)
+    val info = new DataLine.Info(classOf[Clip], audioFormat) 
+    val clip = AudioSystem.getLine(info).asInstanceOf[Clip]        
+    val mic = AudioSystem.getTargetDataLine(audioFormat)
+    val buffer:Array[Byte] = new Array[Byte](buff.length)  
+    mic.open()
+    clip.open(audioFormat, buff, 0, buff.length)
+    val start = System.currentTimeMillis()  
+    mic.start()
+    clip.start
+    mic.read(buffer,0,buffer.length)
+    clip.drain
+    clip.stop
+    clip.close
+    mic.stop()
+    mic.close()
+    buffer
+  }
   
 }
 
