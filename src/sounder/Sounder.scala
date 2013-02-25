@@ -2,7 +2,7 @@
  * Sounder.
  * 
  * @author Robby McKilliam
- * Edited and Added to Thomas Stratfold
+ * Extended by Thomas Stratfold
  */
 
 package sounder
@@ -80,7 +80,8 @@ object Sounder {
     }
     
   }
- // Takes a function as the input and plays and records the signal into an Array Buffer
+
+  // Takes a function as the input and plays and records the signal into an Array Buffer
   def playRecord(f : Double => Double, start2 : Double, stop : Double, sampleRate : Float = 44100F, clipLevel : Double = 100.0): Array[Byte] = {
     
     val audioFormat = new AudioFormat(
@@ -97,6 +98,7 @@ object Sounder {
     val buff = ByteBuffer.allocate(numSamples2*audioFormat.getFrameSize) //buffer for sound
     //buff.order(ByteOrder.LITTLE_ENDIAN)
     for( i <- 1 to numSamples2 ) {
+
       val v = scala.math.round(scala.Short.MaxValue/clipLevel*f(i/sampleRate + start2)).toShort
       buff.putShort(v);
     }
@@ -106,7 +108,7 @@ object Sounder {
 
     val bufferSize:Int = audioFormat.getSampleRate().asInstanceOf[Int]*duration*2
     val buffer:Array[Byte] = new Array[Byte](bufferSize)
-     
+
     mic.open()
     
     clip.open(audioFormat, buff.array, 0, numSamples2*audioFormat.getFrameSize)
@@ -122,8 +124,6 @@ object Sounder {
     
     mic.stop()
     mic.close()
-    
-   // buff.array
     buffer
   }
   
@@ -139,7 +139,8 @@ object Sounder {
     clip2.stop
     clip2.close
   }
-  
+  // Takes a Byte array, plays it through headphone port, while recording mic input
+
   def playBuffRec(buff:Array[Byte], sampleRate : Float = 44100F): Array[Byte] = { 
     val audioFormat = new AudioFormat(sampleRate, 16, 1, true, true)
     val info = new DataLine.Info(classOf[Clip], audioFormat) 

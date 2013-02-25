@@ -1,9 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package sounder
+/*
+ * Author: Thomas Stratfold
+ * Simple function to create a hamming window of the right size
+ */
 
 import math.cos
 import math.Pi
@@ -16,6 +16,4 @@ object HamWind {
     }
     w
   }
-    
-  
 }

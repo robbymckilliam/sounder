@@ -1,27 +1,20 @@
 /*
- * Thomas Stratfold Jan 2012
+ * Thomas Stratfold Jan 2013
  * A simple GUI which should act the same as the command line
  * allowing the user to call any function they chose to be played by the play
  * function
  */
 package sounder
 
-//import scala.math.sin
-//import scala.math.Pi
-//import scala.math.cos
 import scala.math.abs
 import scala.swing._
 import scala.swing.event._
 import scala.collection.mutable._
 import java.io._
-import javax.sound.sampled._ 
-import java.util.Scanner
-//import scala.tools.nsc.interpreter._
 import sounder.Converter.toPlay
 import sounder.Converter.toPlayRecord
 import sounder.Sounder.playBuff
-
-//import sGui.AudioCapture.captureAudio
+import java.util.Scanner
 
 object PlayApp extends SimpleSwingApplication {
   //Creates a simple box layout for the GUI
@@ -101,7 +94,7 @@ object PlayApp extends SimpleSwingApplication {
       case EditDone(Time)     =>          // Altered Time
         x = abs(Time.text.toDouble)
       case ButtonClicked(PlayB)   =>      // Pressed play
-        val temp = toPlay(Af,Aa,Af2,x)             // Calls toPlay method to play function
+        toPlay(Af,Aa,Af2,x)             // Calls toPlay method to play function
         //play(t => (a)*(sin(f*2*Pi*t)),0,x)
         //inter(ft,x)
       case ButtonClicked(ClearB) =>       // Pressed clear
@@ -146,7 +139,6 @@ object PlayApp extends SimpleSwingApplication {
                 }
                 fBuff = arrBuff.toArray
              }
-              
             }          
         })
         contents += new MenuItem(Action("Save") { //val buttons = new Button(Action("Save") {
@@ -162,17 +154,12 @@ object PlayApp extends SimpleSwingApplication {
                 var i = 0
                 for(j<- 0 until fBuff.length/2) {
                   filePrint.write(fBuff(i).toString+"  "+fBuff(i+1).toString+"\n")
-                 i+=2
+                  i+=2
                 }
                 filePrint.close()
               } else if(name(length-3)+name(length-2).toString+name(length-1) == "wav") {
                 sounder.AudioCreater.wavCreater(fBuff, name, 44100F)
               }
-                
-              
-
-            //  println(file.length)
-              //println(fBuff.length)
             }
         })
       
@@ -201,43 +188,5 @@ object PlayApp extends SimpleSwingApplication {
         })
       }
     }
-
   }
-  //Tried using interpreter method, wouldn't work
-  /*def inter(str: String, x: Double) {
-    val m = new IMain() {
-      override protected def parentClassLoader = sGui.Sounder.getClassLoader
-   }
-    //m.interpret("import java.nio.ByteBuffer; import javax.sound.sampled._; import scala.math.round; import scala.Short;")
-    //m.interpret("def play(f : Double => Double, start : Double, stop : Double, sampleRate : Float = 44100F, clipLevel : Double = 100.0) {; val audioFormat = new AudioFormat(sampleRate,16,1,true,true); val info = new DataLine.Info(classOf[Clip], audioFormat); val clip = AudioSystem.getLine(info).asInstanceOf[Clip]; val duration = stop - start; val numSamples = round(duration*sampleRate).toInt; val buff = ByteBuffer.allocate(numSamples*audioFormat.getFrameSize); for( i <- 1 to numSamples ) {; val v = round(scala.Short.MaxValue/clipLevel*f(i/sampleRate + start)).toShort; buff.putShort(v); } clip.open(audioFormat, buff.array, 0, numSamples*audioFormat.getFrameSize); clip.start; Thread.sleep(5); clip.drain; clip.stop; clip.close; }; }")
-    m.interpret("import sGui.Sounder.play")
-    m.interpret("play(t=> "+str+",0,"+x.toString)
-    m.close()
-// m.reset
-  } */
-  
 }
-  
-//Tried using interpreter method, wouldn't work
-  /*def inter(str: String, x: Double) {
-    val m = new IMain()
-    //m.interpret("import java.nio.ByteBuffer; import javax.sound.sampled._; import scala.math.round; import scala.Short;")
-    //m.interpret("def play(f : Double => Double, start : Double, stop : Double, sampleRate : Float = 44100F, clipLevel : Double = 100.0) {; val audioFormat = new AudioFormat(sampleRate,16,1,true,true); val info = new DataLine.Info(classOf[Clip], audioFormat); val clip = AudioSystem.getLine(info).asInstanceOf[Clip]; val duration = stop - start; val numSamples = round(duration*sampleRate).toInt; val buff = ByteBuffer.allocate(numSamples*audioFormat.getFrameSize); for( i <- 1 to numSamples ) {; val v = round(scala.Short.MaxValue/clipLevel*f(i/sampleRate + start)).toShort; buff.putShort(v); } clip.open(audioFormat, buff.array, 0, numSamples*audioFormat.getFrameSize); clip.start; Thread.sleep(5); clip.drain; clip.stop; clip.close; }; }")
-    m.interpret("import sGui.Sounder.play")
-    m.interpret("play(t=> "+str+",0,"+x.toString)
-    m.close()
-// m.reset
-  } */
-
-/*
- *  val out = new ByteArrayOutputStream()
-              val in = new BufferedInputStream(new FileInputStream(file))
-              var read = 0;
-              val buff = new Array[Byte](441000)
-              while( {read = in.read(buff); read > 0} ) {
-                out.write(buff,0,read)
-              }
-              out.flush()
-              val audioBytes = out.toByteArray()
-              fBuff = audioBytes
- */
