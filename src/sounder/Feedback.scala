@@ -32,13 +32,11 @@ object Feedback {
     var temp2 = outBuff
     for(i <- 1 to num) {
       str match {
-        case "adder" => temp2 = adder(temp,temp2,modu) //creates new feedback using previous feedback and original signal
-        case "multiply" => temp2 = multiply(temp,temp2,modu)
+        case "adder" => temp2 = playBuffRec(adder(temp,temp2,modu)) //creates new feedback using previous feedback and original signal
+        case "multiply" => temp2 = playBuffRec(multiply(temp,temp2,modu))
         case _ => println("Invalid feedback method, Current Methods include: adder, multiply")
       }
-    //  playBuff(temp2)
     }
-    temp2
-    
+    temp2  
   }
 }
