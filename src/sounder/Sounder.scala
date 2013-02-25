@@ -25,7 +25,7 @@ object Sounder {
    * sampleRate (default 44100Hz i.e. CD quality) and clipLevel (default 100) which specfies the
    * maximum magnitude f can attain before being clipped (wrapped).
    */
-  def play(f : Double => Double, start : Double, stop : Double, sampleRate : Float = 44100F, clipLevel : Double = 100.0) {
+  def play(f : Double => Double, start : Double, stop : Double, sampleRate : Float = 44100F, clipLevel : Double = 100.0): Array[Byte] = {
     val audioFormat = new AudioFormat(
       sampleRate, //sample rate
       16, //bits per sample (corresponds with Short)
@@ -52,6 +52,7 @@ object Sounder {
     clip.drain
     clip.stop
     clip.close
+    buff.array
   }
   
   // Takes a function as the input and plays and records the signal into an Array Buffer
