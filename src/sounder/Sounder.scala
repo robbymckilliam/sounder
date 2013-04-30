@@ -13,7 +13,6 @@ import scala.math.round
 import scala.Short
 import java.io._
 import java.nio._
-import scala.collection.mutable._
 
 object Sounder {
   
@@ -22,7 +21,18 @@ object Sounder {
    * sampleRate (default 44100Hz i.e. CD quality) and clipLevel (default 100) which specfies the
    * maximum magnitude f can attain before being clipped (wrapped).
    */
-  def play(f : Double => Double, start : Double, stop : Double, sampleRate : Float = 44100F, clipLevel : Double = 100.0): Array[Byte] = {
+  def play(f : Double => Double, start : Double, stop : Double, sampleRate : Float = 44100F, clipLevel : Double = 100.0) {
+    val Ts = 1/sampleRate //sample period
+    val fs = (start to stop by Ts).map(t=>f(t)) //sequence of sample to play
+    playSamples(fs,sampleRate,clipLevel)
+  }
+  
+  /** 
+   * Plays sequence of sample f out of the speakers.  Optional aguments are 
+   * sampleRate (default 44100Hz i.e. CD quality) and clipLevel (default 100) which specfies the
+   * maximum magnitude f can attain before being clipped (wrapped).
+   */
+  def playSamples(f : Seq[Double], sampleRate : Float = 44100F, clipLevel : Double = 100.0) {
     val audioFormat = new AudioFormat(
       sampleRate, //sample rate
       16, //bits per sample (corresponds with Short)
@@ -32,14 +42,13 @@ object Sounder {
     )
     val info = new DataLine.Info(classOf[Clip], audioFormat) 
     val clip = AudioSystem.getLine(info).asInstanceOf[Clip] //cast required in java's sound API, at bit annoying
-        
-    val duration = stop - start
-    val numSamples = scala.math.round(duration*sampleRate).toInt
+       
+    val numSamples = f.length
     val buff = ByteBuffer.allocate(numSamples*audioFormat.getFrameSize) //buffer for sound
     //buff.order(ByteOrder.LITTLE_ENDIAN)
-    for( i <- 1 to numSamples ) {
+    f.foreach{ y =>
       //quantise to a short.  This clips (wraps) if the function is larger than 1
-      val v = scala.math.round(scala.Short.MaxValue/clipLevel*f(i/sampleRate + start)).toShort
+      val v = scala.math.round(scala.Short.MaxValue/clipLevel*y).toShort
       buff.putShort(v);
     }
       
@@ -49,116 +58,58 @@ object Sounder {
     clip.drain
     clip.stop
     clip.close
-    buff.array
-  }
-  
-  def record(start: Double, stop: Double, sampleRate: Float = 44100F, clipLevel: Double = 100.0, recorderTail: Double = 0.05) {
-    val audioFormat = new AudioFormat(sampleRate, 16, 1, true, true)
-    
-    val recorderInfo = new DataLine.Info(classOf[TargetDataLine], audioFormat)
-    val recorder = AudioSystem.getLine(recorderInfo).asInstanceOf[TargetDataLine]
-    
-    val numSamples = round((stop-start)*sampleRate).toInt
-    
-    val recorderBufferSize = 3*ceil((1+recorderTail)*numSamples*audioFormat.getFrameSize).toInt
-    val recorderBuff = ByteBuffer.allocate(recorderBufferSize)
-    
-    recorder.open(audioFormat, recorderBufferSize)
-    recorder.start
-    recorder.flush
-    recorder.read(recorderBuff.array, 0, recorderBufferSize)
-    recorder.stop
-    recorder.close
-    
-    val recordered = recorderBuff.asShortBuffer
-    
-    def y(t : Double) : Double = {
-      //round to a sample
-      val i = round(t * sampleRate).toInt
-      if(i < 0 || i >= recorderBufferSize/2) return 0.0
-      else return recordered.get(i)
-    }
     
   }
 
   // Takes a function as the input and plays and records the signal into an Array Buffer
-  def playRecord(f : Double => Double, start2 : Double, stop : Double, sampleRate : Float = 44100F, clipLevel : Double = 100.0): Array[Byte] = {
+  def playRecord(f : Double => Double, start : Double, stop : Double, sampleRate : Float = 44100F, clipLevel : Double = 100.0): Seq[Double] = {
     
-    val audioFormat = new AudioFormat(
-      sampleRate, //sample rate
-      16, //bits per sample (corresponds with Short)
-      1, //number of channels, 1 for mono, 2 for stereo
-      true, //true = signed, false is unsigned
-      true //bigEndian
-    )
-    val info = new DataLine.Info(classOf[Clip], audioFormat) 
+    val playerFormat = new AudioFormat(sampleRate,16,1, true, true);
+    val recorderFormat = new AudioFormat(sampleRate,16,1, true, true);
+    val info = new DataLine.Info(classOf[Clip], playerFormat) 
     val clip = AudioSystem.getLine(info).asInstanceOf[Clip] //cast required in java's sound API, at bit annoying
         
-    val numSamples2 = scala.math.round((stop-start2)*sampleRate).toInt
-    val buff = ByteBuffer.allocate(numSamples2*audioFormat.getFrameSize) //buffer for sound
+    val numSamples = scala.math.round((stop-start)*sampleRate).toInt
+    val playbuffer = ByteBuffer.allocate(numSamples*playerFormat.getFrameSize) //buffer for player samples
     //buff.order(ByteOrder.LITTLE_ENDIAN)
-    for( i <- 1 to numSamples2 ) {
-
-      val v = scala.math.round(scala.Short.MaxValue/clipLevel*f(i/sampleRate + start2)).toShort
-      buff.putShort(v);
+    for( i <- 1 to numSamples ) {
+      val v = scala.math.round(scala.Short.MaxValue/clipLevel*f(i/sampleRate + start)).toShort
+      playbuffer.putShort(v);
     }
     
-    val duration = (stop - start2).toInt
-    val mic = AudioSystem.getTargetDataLine(audioFormat)
+    val duration = (stop - start).toInt
+    val mic = AudioSystem.getTargetDataLine(recorderFormat)
 
-    val bufferSize:Int = audioFormat.getSampleRate().asInstanceOf[Int]*duration*2
-    val buffer:Array[Byte] = new Array[Byte](bufferSize)
+    val recorderBufferSize:Int = recorderFormat.getFrameSize*duration*sampleRate.toInt
+    val recordbuffer = ByteBuffer.allocate(recorderBufferSize) //buffer recorded sample
 
     mic.open()
-    
-    clip.open(audioFormat, buff.array, 0, numSamples2*audioFormat.getFrameSize)
-
-    val start = System.currentTimeMillis()
-    
+    clip.open(playerFormat, playbuffer.array, 0, numSamples*playerFormat.getFrameSize)
     mic.start()
     clip.start
-    mic.read(buffer,0,buffer.length)
+    mic.read(recordbuffer.array,0,recorderBufferSize)
     clip.drain
     clip.stop
     clip.close
-    
     mic.stop()
     mic.close()
-    buffer
+    
+    //map the bytes to Doubles
+    val shorts = recordbuffer.asShortBuffer
+    (0 until recorderBufferSize/2) map ( i => shorts.get(i).toDouble )
   }
   
-  //Takes a Byte array and plays it through the headphone port
-  def playBuffer(buff: Array[Byte],sampleRate: Float = 44100F) {
+  /// Takes a Byte array and plays it through the headphone port
+  def playBuffer(buff: Array[Byte], sampleRate: Float = 44100F) {
     val format = new AudioFormat(sampleRate,16,1, true, true);
-    val info2 = new DataLine.Info(classOf[Clip], format) 
-    val clip2 = AudioSystem.getLine(info2).asInstanceOf[Clip]
-    clip2.open(format, buff, 0, buff.length)
-    clip2.start
-    Thread.sleep(5)
-    clip2.drain
-    clip2.stop
-    clip2.close
-  }
-  // Takes a Byte array, plays it through headphone port, while recording mic input
-
-  def playBuffRec(buff:Array[Byte], sampleRate : Float = 44100F): Array[Byte] = { 
-    val audioFormat = new AudioFormat(sampleRate, 16, 1, true, true)
-    val info = new DataLine.Info(classOf[Clip], audioFormat) 
-    val clip = AudioSystem.getLine(info).asInstanceOf[Clip]        
-    val mic = AudioSystem.getTargetDataLine(audioFormat)
-    val buffer:Array[Byte] = new Array[Byte](buff.length)  
-    mic.open()
-    clip.open(audioFormat, buff, 0, buff.length)
-    val start = System.currentTimeMillis()  
-    mic.start()
+    val info = new DataLine.Info(classOf[Clip], format) 
+    val clip = AudioSystem.getLine(info).asInstanceOf[Clip]
+    clip.open(format, buff, 0, buff.length)
     clip.start
-    mic.read(buffer,0,buffer.length)
+    Thread.sleep(5)
     clip.drain
     clip.stop
     clip.close
-    mic.stop()
-    mic.close()
-    buffer
   }
-  
+ 
 }

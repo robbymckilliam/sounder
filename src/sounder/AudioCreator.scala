@@ -16,7 +16,6 @@ object AudioCreater {
     } catch {
       case e: Exception => e.printStackTrace()
     }
-    
   }
   
   def wavConverter(file: File): Array[Byte] = {
