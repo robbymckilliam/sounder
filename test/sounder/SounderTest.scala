@@ -7,10 +7,21 @@ package sounder
 import org.junit.Test
 import org.junit.Assert._
 import sounder.Sounder.play
+import sounder.Sounder.playRecord
+import sounder.Sounder.playBuffer
 import scala.math.sin
 import scala.math.Pi
 
 class SounderTest {
+  
+  @Test
+  def PlayRecordTest() {
+    println("Testing playback and recording")
+    println("You should here a 150Hz tone play for 2 seconds.") 
+    val rec = playRecord(t => 50*sin(2*Pi*100*t), 0, 2.0)
+    println("You should hear a recording play for about 2 seconds.") 
+    playBuffer(rec)
+  }
   
   @Test def PlayTest() {
     println("Testing playback")
@@ -24,14 +35,6 @@ class SounderTest {
     play(t => 50*sin(2*Pi*1000*t), 0.0, 2.0)
     println("You should here a 2000Hz tone play for 2 seconds.") 
     play(t => 50*sin(2*Pi*2000*t), 0.0, 2.0)
-  }
-  
-  @Test def SounderTest() {
-    println("Testing the channel sounder. Connect the output of the soundcard to the input")
-    println("You should here a 150Hz tone play for 2 seconds.")
-    val s = new Sounder(t => 50*sin(2*Pi*150*t), 5.0)
-    println("Now playing the recorded copy.")
-    play(s.y, -3, 20)
   }
   
 }
