@@ -61,11 +61,12 @@ object Sounder {
     
   }
 
-  // Takes a function as the input and plays and records the signal into an Array Buffer
-  def playRecord(f : Double => Double, start : Double, stop : Double, sampleRate : Float = 44100F, clipLevel : Double = 100.0): Seq[Double] = {
+  // Takes a function as the input and plays and records the signal.  Returns the two 
+  // sequences of doubles representing the left and right (stereo) signals.
+  def playRecord(f : Double => Double, start : Double, stop : Double, sampleRate : Float = 44100F, clipLevel : Double = 100.0): (Seq[Double], Seq[Double]) = {
     
     val playerFormat = new AudioFormat(sampleRate,16,1, true, true);
-    val recorderFormat = new AudioFormat(sampleRate,16,1, true, true);
+    val recorderFormat = new AudioFormat(sampleRate,16,2, true, true);
     val info = new DataLine.Info(classOf[Clip], playerFormat) 
     val clip = AudioSystem.getLine(info).asInstanceOf[Clip] //cast required in java's sound API, at bit annoying
         
@@ -96,7 +97,10 @@ object Sounder {
     
     //map the bytes to Doubles
     val shorts = recordbuffer.asShortBuffer
-    (0 until recorderBufferSize/2) map ( i => shorts.get(i).toDouble )
+    val right = (0 until recorderBufferSize/2 by 2) map ( i => shorts.get(i).toDouble )
+    val left = (1 until recorderBufferSize/2 by 2) map ( i => shorts.get(i).toDouble )
+    
+    return (left, right)
   }
   
   /// Takes a Byte array and plays it through the headphone port

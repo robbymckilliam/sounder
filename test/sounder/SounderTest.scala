@@ -17,12 +17,14 @@ class SounderTest {
     println("Testing playback and recording")
     println("You should hear a 150Hz tone play for 2 seconds.") 
     val Fs = 44100
-    val rec = playRecord(t => 50*sin(2*Pi*100*t), 0, 2.0, Fs)
-    println("You should hear a recording play for about 2 seconds.") 
-    playSamples(rec)
+    val (left, right) = playRecord(t => 50*sin(2*Pi*100*t), 0, 2.0, Fs)
+    println("Playing back the left channel") 
+    playSamples(left)
+    println("Playing back the right channel") 
+    playSamples(right)
     val filet = new java.io.FileWriter("testdata.csv")
-    (0 until rec.length) foreach { i =>
-      filet.write((i.toDouble/Fs).toString.replace('E', 'e') + "\t" + rec(i).toString.replace('E', 'e')  + "\n")
+    (0 until left.length) foreach { i =>
+      filet.write((i.toDouble/Fs).toString.replace('E', 'e') + "\t" + left(i).toString.replace('E', 'e')  + "\t" + right(i).toString.replace('E', 'e')  + "\n")
     }
     filet.close
   }
