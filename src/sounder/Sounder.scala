@@ -16,12 +16,18 @@ import java.nio._
 
 object Sounder {
   
+  /// clipLevel specfies the maximum magnitude f can attain before being clipped (wrapped).
+  val clipLevel : Double = 1.0 
+  /// Number of bit used for quantising sampled audio 
+  val quantiserBits : Int = 16
+  /// scale from input output values to quantiser values, i.e. betwen minimum and maximum short (16bit) 
+  val quantiserscaler = scala.Short.MaxValue/clipLevel 
+  
   /** 
    * Plays the function f from time start to time stop out of the speakers.  Optional aguments are 
-   * sampleRate (default 44100Hz i.e. CD quality) and clipLevel (default 100) which specfies the
-   * maximum magnitude f can attain before being clipped (wrapped).
+   * sampleRate (default 44100Hz i.e. CD quality)
    */
-  def play(f : Double => Double, start : Double, stop : Double, sampleRate : Float = 44100F, clipLevel : Double = 100.0) {
+  def play(f : Double => Double, start : Double, stop : Double, sampleRate : Float = 44100F) {
     val Ts = 1/sampleRate //sample period
     val fs = (start to stop by Ts).map(t=>f(t)) //sequence of sample to play
     playSamples(fs,sampleRate,clipLevel)
@@ -35,7 +41,7 @@ object Sounder {
   def playSamples(f : Seq[Double], sampleRate : Float = 44100F, clipLevel : Double = 100.0) {
     val audioFormat = new AudioFormat(
       sampleRate, //sample rate
-      16, //bits per sample (corresponds with Short)
+      quantiserBits, //bits per sample (corresponds with Short)
       1, //number of channels, 1 for mono, 2 for stereo
       true, //true = signed, false is unsigned
       true //bigEndian
@@ -63,18 +69,19 @@ object Sounder {
 
   // Takes a function as the input and plays and records the signal.  Returns the two 
   // sequences of doubles representing the left and right (stereo) signals.
-  def playRecord(f : Double => Double, start : Double, stop : Double, sampleRate : Float = 44100F, clipLevel : Double = 100.0): (Seq[Double], Seq[Double]) = {
+  def playRecord(f : Double => Double, start : Double, stop : Double, sampleRate : Float = 44100F): (Seq[Double], Seq[Double]) = {
     
-    val playerFormat = new AudioFormat(sampleRate,16,1, true, true);
-    val recorderFormat = new AudioFormat(sampleRate,16,2, true, true);
+    val playerFormat = new AudioFormat(sampleRate,quantiserBits,1, true, true);
+    val recorderFormat = new AudioFormat(sampleRate,quantiserBits,2, true, true);
     val info = new DataLine.Info(classOf[Clip], playerFormat) 
     val clip = AudioSystem.getLine(info).asInstanceOf[Clip] //cast required in java's sound API, at bit annoying
-        
+    
+    
     val numSamples = scala.math.round((stop-start)*sampleRate).toInt
     val playbuffer = ByteBuffer.allocate(numSamples*playerFormat.getFrameSize) //buffer for player samples
     //buff.order(ByteOrder.LITTLE_ENDIAN)
     for( i <- 1 to numSamples ) {
-      val v = scala.math.round(scala.Short.MaxValue/clipLevel*f(i/sampleRate + start)).toShort
+      val v = scala.math.round(quantiserscaler*f(i/sampleRate + start)).toShort
       playbuffer.putShort(v);
     }
     
@@ -97,8 +104,8 @@ object Sounder {
     
     //map the bytes to Doubles
     val shorts = recordbuffer.asShortBuffer
-    val right = (0 until recorderBufferSize/2 by 2) map ( i => shorts.get(i).toDouble )
-    val left = (1 until recorderBufferSize/2 by 2) map ( i => shorts.get(i).toDouble )
+    val right = (0 until recorderBufferSize/2 by 2) map ( i => shorts.get(i).toDouble/quantiserscaler )
+    val left = (1 until recorderBufferSize/2 by 2) map ( i => shorts.get(i).toDouble/quantiserscaler )
     
     return (left, right)
   }
