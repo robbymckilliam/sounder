@@ -56,8 +56,7 @@ class UtilTest {
   @Test
   def shepardTest() {
     println("You should hear a Shepard tone")
-    val T = 10.0
-    play(sherpard(_),0.0,3*T)
+    play(shepard(_), 0.0, 10.0)
   }
   
 }
