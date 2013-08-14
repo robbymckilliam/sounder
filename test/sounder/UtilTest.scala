@@ -8,6 +8,7 @@ import org.junit.Test
 import org.junit.Assert._
 import sounder.Util._
 import scala.math.Pi
+import sounder.Sounder._
 
 class UtilTest {
   
@@ -50,6 +51,12 @@ class UtilTest {
     assertEquals(d2sinc(-0.1),-3.193029836,tol)
     assertEquals(d2sinc(11.0/10),2.306741312,tol)
     assertEquals(d2sinc(-11.0/10),2.306741312,tol)
+  }
+  
+  @Test
+  def shepardTest() {
+    println("You should hear a Shepard tone")
+    play(shepard(_), 0.0, 10.0)
   }
   
 }
