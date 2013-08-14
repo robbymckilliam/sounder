@@ -8,6 +8,7 @@ import org.junit.Test
 import org.junit.Assert._
 import sounder.Util._
 import scala.math.Pi
+import scala.math.round
 import sounder.Sounder._
 
 class UtilTest {
@@ -55,8 +56,20 @@ class UtilTest {
   
   @Test
   def shepardTest() {
-    println("You should hear a Shepard tone")
-    play(shepard(_), 0.0, 10.0)
+    val f0 = 220 //center frequency of the tone
+    val R = 15
+    val h = 1/Pi
+    val T = R*h //period of the shepard tone
+    val numloops = 3 //number of period that will be played
+    
+    println("You should hear a Shepard tone play for about " + round(numloops*T).toInt + " seconds")
+    
+    val clip = constructClip(shepard(_, f0,R,h), 0.0, T) //construct a clip containing a single period
+    clip.loop(numloops)
+    Thread.sleep(5)
+    clip.drain
+    clip.stop
+    clip.close  
   }
   
 }
