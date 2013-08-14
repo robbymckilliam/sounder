@@ -40,7 +40,21 @@ object Sounder {
    */
   def playSamples(f : Seq[Double], sampleRate : Float = 44100F) {
     val clip = constructClipFromSamples(f, sampleRate)
+    playClip(clip)
+  }
+  
+  /** Starts a clip, waits for it to finish playing (drains), stops it, then closes it */
+  def playClip(clip : Clip) {
     clip.start
+    Thread.sleep(5)
+    clip.drain
+    clip.stop
+    clip.close  
+  }
+   
+  /** Starts a clip looping loops times, waits for it to finish playing all the loops (drains), stops it, then closes it */
+  def loopClip(clip : Clip, loops : Int) {
+    clip.loop(loops)
     Thread.sleep(5)
     clip.drain
     clip.stop
