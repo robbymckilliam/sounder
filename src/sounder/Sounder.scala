@@ -39,7 +39,7 @@ object Sounder {
    * maximum magnitude f can attain before being clipped (wrapped).
    */
   def playSamples(f : Seq[Double], sampleRate : Float = 44100F) {
-    val clip = constructClip(f, sampleRate)
+    val clip = constructClipFromSamples(f, sampleRate)
     clip.start
     Thread.sleep(5)
     clip.drain
@@ -51,7 +51,7 @@ object Sounder {
    * Construct a java.sound Clip containing specified samples ready to play a the specified
    * rate.
    */
-  def constructClip(f : Seq[Double], sampleRate : Float = 44100F) : Clip = {
+  def constructClipFromSamples(f : Seq[Double], sampleRate : Float = 44100F) : Clip = {
       val audioFormat = new AudioFormat(
       sampleRate, //sample rate
       quantiserBits, //bits per sample (corresponds with Short)
@@ -73,9 +73,21 @@ object Sounder {
     clip.open(audioFormat, buff.array, 0, numSamples*audioFormat.getFrameSize)
     return clip
   }
+  
+  /**
+   * Constructs a java.sound.Clip ready to play the function f from start to stop at the specified
+   * sample rate.
+   */
+  def constructClip(f : Double => Double, start : Double, stop : Double, sampleRate : Float = 44100F) : Clip = {
+    val Ts = 1/sampleRate //sample period
+    val fs = (start to stop by Ts).map(t=>f(t)) //sequence of sample to play
+    return constructClipFromSamples(fs, sampleRate)
+  }
 
-  // Takes a function as the input and plays and records the signal.  Returns the two 
-  // sequences of doubles representing the left and right (stereo) signals.
+  /** 
+   * Takes a function as the input and plays and records the signal.  Returns the two 
+   * sequences of doubles representing the left and right (stereo) signals.
+  */
   def playRecord(f : Double => Double, start : Double, stop : Double, sampleRate : Float = 44100F): (Seq[Double], Seq[Double]) = {
     
     val playerFormat = new AudioFormat(sampleRate,quantiserBits,1, true, true);
