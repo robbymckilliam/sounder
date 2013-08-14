@@ -30,7 +30,7 @@ object Sounder {
   def play(f : Double => Double, start : Double, stop : Double, sampleRate : Float = 44100F) {
     val Ts = 1/sampleRate //sample period
     val fs = (start to stop by Ts).map(t=>f(t)) //sequence of sample to play
-    playSamples(fs,sampleRate,clipLevel)
+    playSamples(fs,sampleRate)
   }
   
   /** 
@@ -38,8 +38,21 @@ object Sounder {
    * sampleRate (default 44100Hz i.e. CD quality) and clipLevel (default 100) which specfies the
    * maximum magnitude f can attain before being clipped (wrapped).
    */
-  def playSamples(f : Seq[Double], sampleRate : Float = 44100F, clipLevel : Double = 100.0) {
-    val audioFormat = new AudioFormat(
+  def playSamples(f : Seq[Double], sampleRate : Float = 44100F) {
+    val clip = constructClip(f, sampleRate)
+    clip.start
+    Thread.sleep(5)
+    clip.drain
+    clip.stop
+    clip.close  
+  }
+  
+  /**
+   * Construct a java.sound Clip containing specified samples ready to play a the specified
+   * rate.
+   */
+  def constructClip(f : Seq[Double], sampleRate : Float = 44100F) : Clip = {
+      val audioFormat = new AudioFormat(
       sampleRate, //sample rate
       quantiserBits, //bits per sample (corresponds with Short)
       1, //number of channels, 1 for mono, 2 for stereo
@@ -54,17 +67,11 @@ object Sounder {
     //buff.order(ByteOrder.LITTLE_ENDIAN)
     f.foreach{ y =>
       //quantise to a short.  This clips (wraps) if the function is larger than 1
-      val v = scala.math.round(scala.Short.MaxValue/clipLevel*y).toShort
+      val v = scala.math.round(quantiserscaler*y).toShort
       buff.putShort(v);
-    }
-      
+    }     
     clip.open(audioFormat, buff.array, 0, numSamples*audioFormat.getFrameSize)
-    clip.start
-    Thread.sleep(5)
-    clip.drain
-    clip.stop
-    clip.close
-    
+    return clip
   }
 
   // Takes a function as the input and plays and records the signal.  Returns the two 
