@@ -1,8 +1,7 @@
 /*
  * Sounder.
  * 
- * @author Robby McKilliam
- * Extended by Thomas Stratfold
+ * @authors Robby McKilliam and Thomas Stratfold
  */
 
 package sounder

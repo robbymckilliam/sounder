@@ -39,7 +39,7 @@ object Util {
     else return (Pi*t*cos(Pi*t) - sin(Pi*t)) / (Pi*t*t) 
   }
   
-   /** Second derivative of the sinc function */
+  /** Second derivative of the sinc function */
   def d2sinc(t : Double) : Double = { 
     if(t.abs < 5e-3 ) {  //use a 4th order expansion if t is small
       return  Pi*Pi*( -1.0/3 + pow(Pi,4)*t*t/10 - pow(Pi,6)*pow(t,4)/168)
@@ -64,4 +64,10 @@ object Util {
     return out
   }
 
+  /*
+   * Create a Hamming window of size N
+   *  Author: Thomas Stratfold
+   */
+  def hammingwindow(N: Int) = (0 until N).map( n => 0.54-0.46*cos(2*Pi*n/(N-1)) )
+  
 }
