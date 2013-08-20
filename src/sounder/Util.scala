@@ -47,6 +47,16 @@ object Util {
     else return ((2 - Pi*Pi*t*t)*sin(Pi*t) -2*Pi*t*cos(Pi*t) )/Pi/t/t/t;
   }
   
+  /** Sine Integral.  The integral from negative infinity to t of the sinc function *//
+  /*def Si(t : Double) : Double = {
+    val x = t.abs/Pi //
+     
+    if(x < 2) { //if x is less than 2 we use 7 terms in the power series expansion
+      
+    }
+    
+  }*/
+  
   /** Return a Sherpard tone (sonic barbers pole) at time t.
    * f0 : center frequency where amplitude is largest (default f0=220Hz)
    * R : exponential frequency decay rate. Value of 4 means it takes 4 seconds for the frequency to half (default 15)
