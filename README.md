@@ -1,14 +1,10 @@
 sounder
 =======
 
-To run this GUI, download the .jar file and use the command 'scala -classpath Sounder.jar sounder.PlayApp' to launch the GUI.
+Utilities to play functions through the soundcard and record what comes back.
 
-Alternatively the playing and recording functions can be accessed through the Sounder.scala file.
+This library is used in the Signals and Systems course run at the University of South Australia.  Website:  http://www.itr.unisa.edu.au/itrusers/mckillrg/public_html/signalsandsystems/index.html.
 
 Files contained:
- - AudioCreater.scala -> Contains two methods that will convert a Byte Array to a Wav file and vice versa.
- - Converter.scala -> Contains functions used by PlayApp to call methods from Sounder.
- - Feedback.scala -> Contains Feedback method, that will continously add input from mic to the output, and other methods that add via a loop of audio.
- - HamWind.scala -> Contains a simple Hamming Window function creater
- - PlayApp.scala -> Contains the set up for a GUI to Play, Record, Load and Save sinusoidal audio files
- - Sounder.scala -> Contains the methods to Play and Record sinusoidal functions
+Sounder.scala: contains methods to play and record functions
+Util.scala: contains various utility function
