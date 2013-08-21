@@ -1,3 +1,10 @@
+/**
+ * Utilities for reading and writing audio to wav files
+ * 
+ * @authors Thomas Stratfold and Robby McKilliam
+ * 
+ */
+
 package sounder
 
 import javax.sound.sampled._
@@ -5,9 +12,9 @@ import java.io._
 import java.nio._
 import scala.collection.mutable._
 
-object AudioCreater {
+object FIleIO {
   
-  def wavCreater(Buff: Array[Byte],fileName: String = "Temp", sampleRate: Float = 44100F) {
+  def waveWriter(Buff: Array[Byte],fileName: String = "Temp", sampleRate: Float = 44100F) {
     val audioFormat = new AudioFormat(sampleRate,16,1,true,true)
     val byteArrayIS = new ByteArrayInputStream(Buff)
     val audioIS = new AudioInputStream(byteArrayIS, audioFormat, Buff.length/2)
@@ -18,7 +25,7 @@ object AudioCreater {
     }
   }
   
-  def wavConverter(file: File): Array[Byte] = {
+  def waveReader(file: File): Array[Byte] = {
     val out = new ByteArrayOutputStream() ;
     val in = AudioSystem.getAudioInputStream(file);
            
