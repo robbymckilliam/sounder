@@ -9,4 +9,4 @@ Plug in some speakers or headphones and
 
 ant clean build test
 
-will building everything and run all the tests.  
+will building everything and run all the tests.  Requires Scala 2.10.x
