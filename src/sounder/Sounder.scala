@@ -7,8 +7,6 @@
 package sounder
 
 import javax.sound.sampled._ 
-import scala.math.ceil 
-import scala.math.round 
 import scala.Short
 import java.io._
 import java.nio._
@@ -33,9 +31,8 @@ object Sounder {
   }
   
   /** 
-   * Plays sequence of sample f out of the speakers.  Optional aguments are 
-   * sampleRate (default 44100Hz i.e. CD quality) and clipLevel (default 100) which specfies the
-   * maximum magnitude f can attain before being clipped (wrapped).
+   * Plays sequence of samples f out of the speakers.  An optional agument is
+   * sampleRate (default 44100Hz i.e. CD quality).
    */
   def playSamples(f : Seq[Double], sampleRate : Float = 44100F) {
     val clip = constructClipFromSamples(f, sampleRate)
