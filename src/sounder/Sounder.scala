@@ -194,8 +194,8 @@ object Sounder {
     
     //map the bytes to Doubles
     val shorts = recordbuffer.asShortBuffer
-    val right = (0 until recorderBufferSize/2 by 2) map ( i => shorts.get(i).toDouble/quantiserscaler )
-    val left = (1 until recorderBufferSize/2 by 2) map ( i => shorts.get(i).toDouble/quantiserscaler )
+    val left = (0 until recorderBufferSize/2 by 2) map ( i => shorts.get(i).toDouble/quantiserscaler )
+    val right = (1 until recorderBufferSize/2 by 2) map ( i => shorts.get(i).toDouble/quantiserscaler )
     
     return (left, right)
   }
