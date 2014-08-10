@@ -23,11 +23,9 @@ object FileIO {
     val sampleRate = in.getFormat.getSampleRate
     //println("There are " + in.available + "bytes available in file " + filename)
     
+    protected var isClosed = false
     /** Close the streams we have open */
-    def close = {
-      buffer.close
-      in.close
-    }
+    def close = if(!isClosed) { buffer.close; in.close; isClosed = true }
     
   }
   
@@ -36,7 +34,11 @@ object FileIO {
      */
   class StereoWavReader(filename : String, BUFFSIZE : Int = 4096) extends WavReader(filename, BUFFSIZE) with Iterator[(Double, Double)] {
 
-    override def hasNext : Boolean = buffer.available > 0
+    override def hasNext : Boolean = {
+      if(isClosed) false
+      else if(buffer.available == 0) { close; false }
+      else true
+    }
     
     /** Returns next stereo sample.  If the wav file is mono left and right will be the same.  */
     override def next : (Double, Double)= {
@@ -57,7 +59,11 @@ object FileIO {
    */
   class MonoWavReader(filename : String, BUFFSIZE : Int = 4096) extends WavReader(filename, BUFFSIZE) with Iterator[Double] {
       
-    override def hasNext : Boolean = buffer.available > 0
+    override def hasNext : Boolean = {
+      if(isClosed) false
+      else if(buffer.available == 0) { close; false }
+      else true
+    }
     
     /** Returns nextsample.  If the wav file is stereo, returns the average of left and right samples.  */
     override def next : Double = {

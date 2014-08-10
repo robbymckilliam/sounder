@@ -4,6 +4,7 @@ import org.junit.Test
 import org.junit.Assert._
 import sounder.Sounder._
 import sounder.FileIO.StereoWavReader
+import sounder.FileIO.StereoWavWriter
 import sounder.FileIO.MonoWavReader
 import sounder.FileIO.WavWriter
 import javax.sound.sampled.AudioFormat
@@ -26,14 +27,38 @@ class FileIOTest {
     assertTrue(fsrstereo.size == fs.size)
     fs.indices.foreach( i => assertEquals(fs(i), fsrstereo(i), 0.01) )
     //fs.indices.foreach( i => println(fs(i), fsrstereo(i)) )
-    stereoreader.close
     
     val monoreader = new MonoWavReader("testfile.wav")
     val fsrmono = monoreader.toArray //puts samples in an array
     assertTrue(fsrmono.size == fs.size)
     fs.indices.foreach( i => assertEquals(fs(i), fsrmono(i), 0.01) )
     //fs.indices.foreach( i => println(fs(i), fsrmono(i)) )
-    monoreader.close
+    
+  }
+  
+  @Test 
+  def wavStereoWriterReaderTest {
+    val Fs = 44100F
+    val Ts = 1/Fs
+    def fl(t : Double) = 0.5*sin(2*Pi*200*t)
+    def fr(t : Double) = 0.5*sin(2*Pi*1000*t)
+    val writer = new StereoWavWriter("teststereowriter.wav")
+    val ts = (0.0 to 2.0 by Ts)
+    ts.foreach( t => writer.put(fl(t), fr(t)))
+    writer.close
+    
+    val fsrstereo = new StereoWavReader("teststereowriter.wav").toArray //array of (Double, Double) tuples
+    assertTrue(fsrstereo.size == ts.size)
+    ( ts, fsrstereo).zipped.foreach { (t, s) => //assert left and right sample are correct
+      assertEquals(fl(t), s._1, 0.01)
+      assertEquals(fr(t), s._2, 0.01)
+    }
+    //fs.indices.foreach( i => println(fs(i), fsrstereo(i)) )
+    
+    val fsrmono = new MonoWavReader("teststereowriter.wav").toArray //puts samples in an array
+    assertTrue(fsrmono.size == ts.size)
+    ( ts, fsrmono).zipped.foreach { (t, s) => assertEquals( (fl(t) + fr(t))/2.0, s, 0.01) } //should average stereo samples
+    //( ts, fsrmono).zipped.foreach { (t, s) => println(t, s, (fl(t) + fr(t))/2, fl(t), fr(t)) }
     
   }
   
