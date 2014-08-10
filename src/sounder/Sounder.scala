@@ -139,7 +139,7 @@ object Sounder {
    
     if(fleft.length != fright.length) throw new ArrayIndexOutOfBoundsException("Number of samples on left and right must be the same.")
     val numSamples = fleft.length
-    val buff = ByteBuffer.allocate(2*numSamples*audioFormat.getFrameSize) //buffer for sound
+    val buff = ByteBuffer.allocate(numSamples*audioFormat.getFrameSize) //buffer for sound
     //buff.order(ByteOrder.LITTLE_ENDIAN)
     (fleft, fright).zipped.foreach{ (left, right)=>
       buff.putShort(scala.math.round(quantiserscaler*left).toShort);
