@@ -21,6 +21,9 @@ object Util {
   
   /** Returns the (centered) fractional part of t */
   def fracpart(t : Double) : Double = t - round(t)
+  
+  //takes its argument modulo 2pi in to the interval [0,2pi]
+  def mod2pi(x : Double) = 2*Pi*(x/2/Pi - floor(x/2/Pi))
     
   /** The sinc function sin(pi x)/(pi x) */
   def sinc(t : Double) : Double = { 
