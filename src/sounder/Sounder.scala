@@ -81,6 +81,15 @@ object Sounder {
   }
   
   /** 
+   * Takes an array of samples and plays them at rate sampleRate.  Simultaneously records
+   * left and right stereo input.  Returns recorded samples in two arrays.
+   */
+  def playRecordSamples(f : Seq[Double], sampleRate : Float = 44100F) : (Seq[Double], Seq[Double]) = {
+    val clip = constructClipFromSamples(f, sampleRate)
+     return playRecordFromClip(clip)
+  }
+  
+  /** 
    * Plays functions out the left and right and records the simultaneously.  Returns the two 
    * sequences of doubles representing the left and right (stereo) signals recorded.
    */
