@@ -55,6 +55,15 @@ class UtilTest {
   }
   
   @Test
+  def log2Test() {
+    println("Testing log2")
+    val tol = 1e-8
+    assertEquals(log2(2),1,tol)
+    assertEquals(log2(4),2,tol)
+    assertEquals(log2(14.4),3.84799690655,tol)
+  }
+  
+  @Test
   def shepardTest() {
     val f0 = 220 //center frequency of the tone
     val R = 15
