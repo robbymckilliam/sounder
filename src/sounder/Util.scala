@@ -22,8 +22,13 @@ object Util {
   /** Returns the (centered) fractional part of t */
   def fracpart(t : Double) : Double = t - round(t)
   
-  //takes its argument modulo 2pi in to the interval [0,2pi]
+  /** Takes its argument modulo 2pi in to the interval [0,2pi] */
   def mod2pi(x : Double) = 2*Pi*(x/2/Pi - floor(x/2/Pi))
+  
+  /** The natual logarithm of 2 */
+  val ln2 = log(2)
+  /** logarithm with base 2 */
+  def log2(x : Double) = log(x)/ln2
     
   /** The sinc function sin(pi x)/(pi x) */
   def sinc(t : Double) : Double = { 
@@ -49,10 +54,6 @@ object Util {
     }
     else return ((2 - Pi*Pi*t*t)*sin(Pi*t) -2*Pi*t*cos(Pi*t) )/Pi/t/t/t;
   }
-  
-  /** The natual logarithm of 2 */
-  val ln2 = log(2)
-  def log2(x : Double) = log(x)/ln2
   
   /** Return a Sherpard tone (sonic barbers pole) at time t.
    * f0 : center frequency where amplitude is largest (default f0=220Hz)
